@@ -1,0 +1,122 @@
+scalar JSON
+
+type Query {
+  users: [User]
+  categories(
+    filter: CategoryFilter
+    limit: Int = 10
+    number_page: Int = 1
+  ): CategorySearchResult
+  components(limit: Int = 10, numberPage: Int = 1): [Component]
+  products(
+    filter: ProductFilter,
+    limit: Int = 10
+    number_page: Int = 1
+  ): ProductSearchResult
+}
+
+input CategoryFilter {
+  query: String
+}
+
+input ProductFilter {
+  ids: [String]
+  query: String
+  available: Boolean
+  new: Boolean
+  components: [String]
+  minPrice: Float
+  maxPrice: Float
+}
+
+type CategorySearchResult {
+  items: [Category]
+  page_info: SearchResultPageInfo
+  total_count: Int
+}
+
+type ProductSearchResult {
+  items: [Product]
+  page_info: SearchResultPageInfo
+  total_count: Int
+}
+
+type SearchResult {
+  page_info: SearchResultPageInfo
+  total_count: Int
+}
+
+type SearchResultPageInfo {
+  "Specifies which page of results to return"
+  current_page: Int
+  "Specifies the maximum number of items to return"
+  page_size: Int
+  "Total pages"
+  total_pages: Int
+}
+
+type Category {
+  id: ID!
+  name: String
+  products(
+    filter: ProductFilter,
+    limit: Int = 10
+    number_page: Int = 1
+  ): ProductSearchResult
+}
+
+type Product {
+  id: ID!
+  name: String
+  type: ProductType
+  image: String
+  new: Boolean
+  available: Boolean
+  components: [Component]
+  variants: [Variant]
+}
+
+type Component {
+  id: ID!
+  name: String
+  price: Float
+  image: String
+  products: [Product]
+  productItems: [ProductItem]
+}
+
+type Variant {
+  id: ID!
+  price: Float
+  data: JSON
+  image: String
+}
+
+type User {
+  id: String
+  name: String
+  email: String
+}
+type ProductItem {
+  id: String
+  variantId: String
+  variant: Variant
+  components: [Component]
+  cartItems: [CartItem]
+  data: JSON
+}
+
+type CartItem {
+  id: String
+  cartId: String
+  name: String
+  productItemId: String
+  productItem: ProductItem
+  qty: Int
+  totalAmount: Float
+}
+
+enum ProductType {
+  SIMPLE
+  PIZA
+}

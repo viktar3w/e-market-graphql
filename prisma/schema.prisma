@@ -1,0 +1,361 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  firstname String
+  lastname  String
+  phone     String?
+  email     String   @unique
+  carts     Cart[]
+  orders    Order[]
+  image     String?
+  status    UserType @default(value: ENABLED)
+
+  verified         DateTime?
+  verificationCode VerificationCode?
+
+  support Support?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Support {
+  id              String          @id @default(cuid())
+  user            User            @relation(fields: [userId], references: [id])
+  userId          String          @unique
+  apiKey          String          @unique @default(cuid())
+  limit           Int
+  plan            SupportPlan
+  socials         Social[]
+  eventCategories EventCategory[]
+  events          Event[]
+
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  limits    LimitSupport[]
+
+  @@index([apiKey, userId])
+}
+
+model LimitSupport {
+  id        String  @id @default(cuid())
+  support   Support @relation(fields: [supportId], references: [id])
+  supportId String  @unique
+
+  year  Int
+  month Int
+  count Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventCategory {
+  id        String  @id @default(cuid())
+  name      String
+  color     Int
+  emoji     String?
+  support   Support @relation(fields: [supportId], references: [id])
+  supportId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  events    Event[]
+
+  @@unique([supportId, name])
+}
+
+model Event {
+  id      String @id @default(cuid())
+  data    Json
+  message String
+
+  support   Support @relation(fields: [supportId], references: [id])
+  supportId String
+
+  name   String
+  fields Json
+  status DeliveryStatus @default(value: PENDING)
+
+  eventCategory   EventCategory? @relation(fields: [eventCategoryId], references: [id])
+  eventCategoryId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model Social {
+  id        String     @id @default(cuid())
+  type      SocialType @default(value: TELEGRAM)
+  authKey   String     @unique
+  support   Support    @relation(fields: [supportId], references: [id])
+  supportId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([authKey, type])
+  @@index([supportId, type])
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  type       ProductType @default(value: SIMPLE)
+  image      String?
+  new        Boolean     @default(false)
+  available  Boolean     @default(true)
+  categories Category[]
+  components Component[]
+  variants   Variant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Component {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  price        Float
+  image        String?
+  products     Product[]
+  productItems ProductItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Variant {
+  id          String        @id @default(cuid())
+  price       Float
+  data        Json
+  image       String?
+  product     Product       @relation(fields: [productId], references: [id])
+  productId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  ProductItem ProductItem[]
+}
+
+model ProductItem {
+  id         String      @id @default(cuid())
+  variantId  String
+  variant    Variant     @relation(fields: [variantId], references: [id])
+  components Component[]
+
+  cartItems CartItem[]
+
+  data Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id          String  @id @default(cuid())
+  userId      String?
+  user        User?   @relation(fields: [userId], references: [id])
+  totalAmount Float   @default(0)
+  qty         Int     @default(0)
+
+  firstname String?
+  lastname  String?
+  phone     String?
+  email     String?
+  status    CartStatus @default(value: ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartItems         CartItem[]
+  Order             Order[]
+  shippingAddress   ShippingAddress? @relation(fields: [shippingAddressId], references: [id])
+  shippingAddressId String?
+  billingAddress    BillingAddress?  @relation(fields: [billingAddressId], references: [id])
+  billingAddressId  String?
+}
+
+model CartItem {
+  id            String      @id @default(cuid())
+  cartId        String
+  cart          Cart        @relation(fields: [cartId], references: [id])
+  name          String
+  productItemId String
+  productItem   ProductItem @relation(fields: [productItemId], references: [id])
+
+  qty         Int   @default(1)
+  totalAmount Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id             String       @id @default(cuid())
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id])
+  token          String
+  taxAmount      Float
+  shippingAmount Float
+  totalAmount    Float
+  summaryAmount  Float
+  qty            Int          @default(1)
+  status         OrderStatus  @default(value: PENDING)
+  paymentType    PaymentType?
+  paymentId      String?
+  items          Json
+  currency       String       @default("USD")
+
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  shippingAddressId String
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id])
+  billingAddressId  String?
+  billingAddress    BillingAddress? @relation(fields: [billingAddressId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShippingAddress {
+  id        String  @id @default(cuid())
+  email     String
+  firstname String
+  lastname  String
+  street    String
+  city      String
+  postcode  String
+  country   String
+  state     String?
+  phone     String?
+  orders    Order[]
+  carts     Cart[]
+}
+
+model BillingAddress {
+  id        String  @id @default(cuid())
+  email     String
+  firstname String
+  lastname  String
+  street    String
+  city      String
+  postcode  String
+  country   String
+  state     String?
+  phone     String?
+  orders    Order[]
+  carts     Cart[]
+}
+
+model VerificationCode {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  code String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, code])
+}
+
+model Story {
+  id              String @id @default(cuid())
+  previewImageUrl String
+
+  items StoryItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model StoryItem {
+  id String @id @default(cuid())
+
+  storyId String
+  story   Story  @relation(fields: [storyId], references: [id])
+
+  sourceUrl String
+
+  createdAt DateTime @default(now())
+}
+
+model BlockedUser {
+  id     String     @id @default(cuid())
+  chatId Int        @unique
+  type   SocialType @default(value: TELEGRAM)
+  reason String?
+  limit  Int        @default(3)
+
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([chatId, type])
+}
+
+enum OrderStatus {
+  PENDING
+  SUCCEEDED
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PaymentType {
+  STRIPE
+}
+
+enum ProductType {
+  SIMPLE
+  PIZA
+}
+
+enum UserType {
+  ENABLED
+  DISABLED
+}
+
+enum CartStatus {
+  ACTIVE
+  NOT_ACTIVE
+}
+
+enum SupportPlan {
+  PRO
+  FREE
+}
+
+enum SocialType {
+  TELEGRAM
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILD
+}
