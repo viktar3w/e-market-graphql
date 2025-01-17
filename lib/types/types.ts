@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import {dbType} from "@/lib/db";
 
 export type CheckboxFilterType = {
   text: string;
@@ -24,4 +25,15 @@ export type CountButtonType = {
 
 export type ResultResponse = {
   success: boolean;
+};
+
+export type ContextGraphql = {
+  prisma: dbType;
+  userId?: string;
+  cartId?: string;
+};
+
+export type MutationCommonProps = {
+  _parent: unknown;
+  context: ContextGraphql;
 };

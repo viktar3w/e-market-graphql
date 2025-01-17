@@ -1,5 +1,16 @@
 scalar JSON
 
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+directive @cacheControl(
+  maxAge: Int
+  scope: CacheControlScope
+  inheritMaxAge: Boolean
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
 type Query {
   users: [User]
   categories(
@@ -9,10 +20,52 @@ type Query {
   ): CategorySearchResult
   components(limit: Int = 10, numberPage: Int = 1): [Component]
   products(
-    filter: ProductFilter,
+    filter: ProductFilter
     limit: Int = 10
     number_page: Int = 1
   ): ProductSearchResult
+  cart(cartId: String): Cart
+}
+
+type Mutation {
+  cart: MutationCart
+}
+
+type MutationCart {
+  addItem(input: AddCartItemInput!): DefaultResponse
+  updateItem(input: UpdateCartItemInput!): DefaultResponse
+  deleteItem(input: DeleteCartItemInput!): DefaultResponse
+  addShippingAddress(input: ShippingAddressInput!): DefaultResponse
+  updateShippingAddress(input: ShippingAddressInput!): DefaultResponse
+  deleteShippingAddress: DefaultResponse
+}
+
+input AddCartItemInput {
+  amount: Float!
+  variantId: String!
+  qty: Int!
+  componentIds: [String]
+}
+
+input UpdateCartItemInput {
+  itemId: String!
+  qty: Int!
+}
+
+input DeleteCartItemInput {
+  itemId: String!
+}
+
+input ShippingAddressInput {
+  firstname: String!
+  lastname: String!
+  email: String!
+  phone: String!
+  country: String!
+  city: String!
+  state: String
+  street: String!
+  postcode: String!
 }
 
 input CategoryFilter {
@@ -59,10 +112,10 @@ type Category {
   id: ID!
   name: String
   products(
-    filter: ProductFilter,
+    filter: ProductFilter
     limit: Int = 10
     number_page: Int = 1
-  ): ProductSearchResult
+  ): ProductSearchResult @cacheControl(maxAge: 60, scope: PUBLIC)
 }
 
 type Product {
@@ -98,25 +151,128 @@ type User {
   email: String
 }
 type ProductItem {
-  id: String
-  variantId: String
-  variant: Variant
+  id: String!
+  variant: Variant!
   components: [Component]
   cartItems: [CartItem]
   data: JSON
 }
 
+type Cart {
+  id: String!
+  userId: String
+  user: User
+  totalAmount: Float!
+  qty: Int!
+  firstname: String
+  lastname: String
+  phone: String
+  email: String
+  status: CartStatus
+
+  cartItems: [CartItem]
+  shippingAddress: ShippingAddress
+  billingAddress: BillingAddress
+}
+
 type CartItem {
+  id: String!
+  cartId: String!
+  name: String!
+  productItem: ProductItem!
+  qty: Int!
+  totalAmount: Float!
+}
+
+type ShippingAddress implements Address {
   id: String
-  cartId: String
-  name: String
-  productItemId: String
-  productItem: ProductItem
-  qty: Int
-  totalAmount: Float
+  email: String
+  firstname: String
+  lastname: String
+  street: String
+  city: String
+  postcode: String
+  country: String
+  state: String
+  phone: String
+}
+
+type BillingAddress implements Address {
+  id: String
+  email: String
+  firstname: String
+  lastname: String
+  street: String
+  city: String
+  postcode: String
+  country: String
+  state: String
+  phone: String
+}
+
+type DefaultResponse {
+  success: Boolean!
+}
+
+interface Address {
+  id: String
+  email: String
+  firstname: String
+  lastname: String
+  street: String
+  city: String
+  postcode: String
+  country: String
+  state: String
+  phone: String
+}
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+enum OrderStatus {
+  PENDING
+  SUCCEEDED
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PaymentType {
+  STRIPE
 }
 
 enum ProductType {
   SIMPLE
-  PIZA
+  PIZZA
+}
+
+enum UserType {
+  ENABLED
+  DISABLED
+}
+
+enum CartStatus {
+  ACTIVE
+  NOT_ACTIVE
+}
+
+enum SupportPlan {
+  PRO
+  FREE
+}
+
+enum SocialType {
+  TELEGRAM
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
 }

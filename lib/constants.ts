@@ -2,6 +2,9 @@ export const CART_COOKIE_KEY = "cartToken" as const;
 export const SIGN_OUT_KEY = "signOut";
 export const CART_LOCALSTORAGE = "cart" as const;
 
+export const USER_HEADER_KEY = 'X-USER-ID' as const;
+export const CART_HEADER_KEY = 'X-CART-ID' as const;
+
 export const DEFAULT_COMPONENT_SIZE = 10 as const;
 export const DEFAULT_PRODUCT_SIZE = 10 as const;
 export const DEFAULT_PRODUCT_NUMBER_PAGE = 1 as const;
