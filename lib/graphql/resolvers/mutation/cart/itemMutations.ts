@@ -233,8 +233,12 @@ const mutations = {
           cart: cartInfo as CartState,
         }),
       });
-    } catch (e: any) {
-      console.log("[ERROR] can't send order create email: ", e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.log("[ERROR] can't send order create email: ", e.message);
+      } else {
+        console.error('[ERROR] PlaceOrder Unknown error');
+      }
     }
 
     return {
