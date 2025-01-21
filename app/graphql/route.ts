@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { cache } from "@/lib/apollo/cache";
 import { CART_HEADER_KEY, USER_HEADER_KEY } from "@/lib/constants";
+import { stripe } from "@/lib/stripe/stripe";
 
 type ApolloContext = {
   req: NextRequest;
@@ -35,6 +36,7 @@ const handler = startServerAndCreateNextHandler<NextRequest, ApolloContext>(
       prisma: db,
       userId: req.headers.get(USER_HEADER_KEY),
       cartId: req.headers.get(CART_HEADER_KEY),
+      stripe: stripe,
     }),
   },
 );

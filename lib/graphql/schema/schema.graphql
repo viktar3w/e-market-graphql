@@ -38,6 +38,8 @@ type MutationCart {
   addShippingAddress(input: ShippingAddressInput!): DefaultResponse
   updateShippingAddress(input: ShippingAddressInput!): DefaultResponse
   deleteShippingAddress: DefaultResponse
+  updatePersonalData(input: UpdatePersonalDataInput): DefaultResponse
+  placeOrder(input: PlaceOrderInput!): PlaceOrderResponse
 }
 
 input AddCartItemInput {
@@ -68,6 +70,13 @@ input ShippingAddressInput {
   postcode: String!
 }
 
+input UpdatePersonalDataInput {
+  firstname: String!
+  lastname: String!
+  email: String!
+  phone: String!
+}
+
 input CategoryFilter {
   query: String
 }
@@ -80,6 +89,12 @@ input ProductFilter {
   components: [String]
   minPrice: Float
   maxPrice: Float
+}
+
+input PlaceOrderInput {
+  taxAmount: Float
+  shippingAmount: Float
+  summaryAmount: Float
 }
 
 type CategorySearchResult {
@@ -208,6 +223,10 @@ type BillingAddress implements Address {
   country: String
   state: String
   phone: String
+}
+
+type PlaceOrderResponse {
+  url: String
 }
 
 type DefaultResponse {

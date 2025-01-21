@@ -9,6 +9,7 @@ import type { IExecutableSchemaDefinition } from "@graphql-tools/schema";
 import cartMutations from "@/lib/graphql/resolvers/mutation/cartMutations";
 import itemMutations from "@/lib/graphql/resolvers/mutation/cart/itemMutations";
 import shippingMutations from "@/lib/graphql/resolvers/mutation/cart/shippingMutations";
+import userMutations from "@/lib/graphql/resolvers/mutation/cart/userMutations";
 
 const resolvers: IExecutableSchemaDefinition["resolvers"] = {
   JSON: GraphQLJSON,
@@ -28,6 +29,7 @@ const resolvers: IExecutableSchemaDefinition["resolvers"] = {
   MutationCart: {
     ...itemMutations,
     ...shippingMutations,
+    ...userMutations,
   },
 };
 

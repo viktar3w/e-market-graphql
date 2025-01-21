@@ -9,7 +9,11 @@ import {
 
 import { VariantItem } from "@/lib/types/product";
 import { ContextGraphql } from "@/lib/types/types";
-import { CheckoutDeliverySchema } from "@/lib/validations/checkout";
+import {
+  CheckoutDeliverySchema,
+  CheckoutPersonalDataSchema,
+  CheckoutPlaceOrderSchema,
+} from "@/lib/validations/checkout";
 
 export type MutationAddCartItemProps = {
   args: {
@@ -42,6 +46,18 @@ export type MutationDeleteCartItemProps = {
 export type MutationShippingAddressProps = {
   args: {
     input: CheckoutDeliverySchema;
+  };
+} & MutationCommonProps;
+
+export type MutationUpdatePersonalDataProps = {
+  args: {
+    input: CheckoutPersonalDataSchema;
+  };
+} & MutationCommonProps;
+
+export type MutationPlaceOrderProps = {
+  args: {
+    input: CheckoutPlaceOrderSchema;
   };
 } & MutationCommonProps;
 

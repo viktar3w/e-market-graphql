@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import {dbType} from "@/lib/db";
+import { dbType } from "@/lib/db";
+import { stripeType } from "@/lib/stripe/stripe";
 
 export type CheckboxFilterType = {
   text: string;
@@ -8,19 +9,19 @@ export type CheckboxFilterType = {
   onCheckedChange?: (checked: boolean) => void;
   checked?: boolean;
   name?: string;
-}
+};
 
 export type ItemVariation<T> = {
-  text: string
-  value: T
-}
+  text: string;
+  value: T;
+};
 
 export type CountButtonType = {
   className?: string;
   value?: number;
   size?: "sm" | "lg";
   onClick?: (type: "plus" | "minus") => void;
-  disabled?: boolean
+  disabled?: boolean;
 };
 
 export type ResultResponse = {
@@ -31,6 +32,7 @@ export type ContextGraphql = {
   prisma: dbType;
   userId?: string;
   cartId?: string;
+  stripe: stripeType;
 };
 
 export type MutationCommonProps = {
