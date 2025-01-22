@@ -15,6 +15,7 @@ type ApolloContext = {
 };
 
 const server = new ApolloServer<ApolloContext>({
+  introspection: true,
   typeDefs,
   csrfPrevention: false,
   resolvers,
