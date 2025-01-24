@@ -1,5 +1,8 @@
 import { db } from "@/lib/db";
 import { DEFAULT_COMPONENT_SIZE } from "@/lib/constants";
+import { generateCacheKey } from "@/lib/utils";
+
+const componentSearchCache: Map<string, string> = new Map();
 
 const queries = {
   components: async (
@@ -7,9 +10,13 @@ const queries = {
     args: { limit: number; numberPage: number },
     context: { prisma: typeof db },
   ) => {
+    const search = generateCacheKey(args);
+    if (componentSearchCache.has(search)) {
+      return JSON.parse(componentSearchCache.get(search)!);
+    }
     const limit = args?.limit || DEFAULT_COMPONENT_SIZE;
     const numberPage = args?.numberPage || 1;
-    return await context.prisma.component.findMany({
+    const result = await context.prisma.component.findMany({
       skip: (numberPage - 1) * limit,
       take: limit,
       where: {
@@ -21,6 +28,8 @@ const queries = {
         products: true,
       },
     });
+    componentSearchCache.set(search, JSON.stringify(result));
+    return result;
   },
 };
 
