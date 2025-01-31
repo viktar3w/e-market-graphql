@@ -24,7 +24,7 @@ type Query {
     limit: Int = 10
     number_page: Int = 1
   ): ProductSearchResult
-  cart(cartId: String): Cart
+  cart: Cart
 }
 
 type Mutation {

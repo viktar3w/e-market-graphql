@@ -1,15 +1,15 @@
-import { db } from "@/lib/db";
 import { CartStatus } from "@prisma/client";
+import { ContextGraphql } from "@/lib/types/types";
 
 const queries = {
-  cart: async (
-    _parent: unknown,
-    args: { cartId: string },
-    context: { prisma: typeof db; userId: string | null },
-  ) => {
+  cart: async (_: unknown, __: unknown, context: ContextGraphql) => {
+    const { prisma: db, cartId, userId } = context;
+    if (!cartId) {
+      throw new Error("Check your graphql endpoint");
+    }
     const cart = await db.cart.findUnique({
       where: {
-        id: args.cartId,
+        id: cartId,
         status: CartStatus.ACTIVE,
       },
       include: {
@@ -33,11 +33,7 @@ const queries = {
         shippingAddress: true,
       },
     });
-    if (
-      !cart ||
-      (!context?.userId && !!cart?.userId) ||
-      context.userId !== cart.userId
-    ) {
+    if (!cart || (!userId && !!cart?.userId) || userId !== cart.userId) {
       throw new Error("We can't find cart");
     }
     return cart;
