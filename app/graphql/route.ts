@@ -39,7 +39,7 @@ const handler = startServerAndCreateNextHandler<NextRequest, ApolloContext>(
         req,
         prisma: db,
         userId,
-        cartId: req.cookies.get(CART_COOKIE_KEY),
+        cartId: req.cookies.get(CART_COOKIE_KEY)?.value,
         stripe: stripe,
       };
     },

@@ -31,6 +31,7 @@ const queries = {
           },
         },
         shippingAddress: true,
+        billingAddress: true,
       },
     });
     if (!cart || (!userId && !!cart?.userId) || userId !== cart.userId) {

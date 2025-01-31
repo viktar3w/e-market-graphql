@@ -125,7 +125,7 @@ type SearchResultPageInfo {
 
 type Category {
   id: ID!
-  name: String
+  name: String!
   products(
     filter: ProductFilter
     limit: Int = 10
@@ -135,19 +135,19 @@ type Category {
 
 type Product {
   id: ID!
-  name: String
-  type: ProductType
+  name: String!
+  type: ProductType!
   image: String
-  new: Boolean
-  available: Boolean
+  new: Boolean!
+  available: Boolean!
   components: [Component]
   variants: [Variant]
 }
 
 type Component {
   id: ID!
-  name: String
-  price: Float
+  name: String!
+  price: Float!
   image: String
   products: [Product]
   productItems: [ProductItem]
@@ -155,15 +155,19 @@ type Component {
 
 type Variant {
   id: ID!
-  price: Float
+  price: Float!
   data: JSON
   image: String
 }
 
 type User {
-  id: String
-  name: String
-  email: String
+  id: String!
+  firstname: String!
+  lastname: String!
+  phone: String!
+  email: String!
+  image: String!
+  status: UserType!
 }
 type ProductItem {
   id: String!
@@ -200,27 +204,27 @@ type CartItem {
 }
 
 type ShippingAddress implements Address {
-  id: String
-  email: String
-  firstname: String
-  lastname: String
-  street: String
-  city: String
-  postcode: String
-  country: String
+  id: String!
+  email: String!
+  firstname: String!
+  lastname: String!
+  street: String!
+  city: String!
+  postcode: String!
+  country: String!
   state: String
   phone: String
 }
 
 type BillingAddress implements Address {
-  id: String
-  email: String
-  firstname: String
-  lastname: String
-  street: String
-  city: String
-  postcode: String
-  country: String
+  id: String!
+  email: String!
+  firstname: String!
+  lastname: String!
+  street: String!
+  city: String!
+  postcode: String!
+  country: String!
   state: String
   phone: String
 }
