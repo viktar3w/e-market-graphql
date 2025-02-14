@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 import { db } from "@/lib/db";
 import { CategoryProductParent, ProductArgsType } from "@/lib/types/product";
 import {
@@ -47,6 +49,23 @@ const queries = {
 
     if (!!minPrice || !!maxPrice) {
       products = preparedProductVariantsByPrice(products, minPrice, maxPrice);
+    }
+    if (!!args?.sort?.price) {
+      products = products
+        .map((product) => {
+          const minPrice = Math.min(
+            ...product.variants.map((variant) => variant.price),
+          );
+          return {
+            ...product,
+            minPrice,
+          };
+        })
+        .sort((a, b) =>
+          args.sort!.price === Prisma.SortOrder.asc
+            ? a.minPrice - b.minPrice
+            : b.minPrice - a.minPrice,
+        );
     }
     const size = Number(args?.limit || DEFAULT_PRODUCT_SIZE);
     const result = {

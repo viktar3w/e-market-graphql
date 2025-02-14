@@ -22,7 +22,8 @@ type Query {
   products(
     filter: ProductFilter
     limit: Int = 10
-    number_page: Int = 1
+    number_page: Int = 1,
+    sort: ProductSort
   ): ProductSearchResult
   cart: Cart
 }
@@ -40,61 +41,6 @@ type MutationCart {
   deleteShippingAddress: DefaultResponse
   updatePersonalData(input: UpdatePersonalDataInput): DefaultResponse
   placeOrder(input: PlaceOrderInput!): PlaceOrderResponse
-}
-
-input AddCartItemInput {
-  amount: Float!
-  variantId: String!
-  qty: Int!
-  componentIds: [String]
-}
-
-input UpdateCartItemInput {
-  itemId: String!
-  qty: Int!
-}
-
-input DeleteCartItemInput {
-  itemId: String!
-}
-
-input ShippingAddressInput {
-  firstname: String!
-  lastname: String!
-  email: String!
-  phone: String!
-  country: String!
-  city: String!
-  state: String
-  street: String!
-  postcode: String!
-}
-
-input UpdatePersonalDataInput {
-  firstname: String!
-  lastname: String!
-  email: String!
-  phone: String!
-}
-
-input CategoryFilter {
-  query: String
-}
-
-input ProductFilter {
-  ids: [String]
-  query: String
-  available: Boolean
-  new: Boolean
-  components: [String]
-  minPrice: Float
-  maxPrice: Float
-}
-
-input PlaceOrderInput {
-  taxAmount: Float
-  shippingAmount: Float
-  summaryAmount: Float
 }
 
 type CategorySearchResult {
@@ -130,6 +76,7 @@ type Category {
     filter: ProductFilter
     limit: Int = 10
     number_page: Int = 1
+    sort: ProductSort
   ): ProductSearchResult @cacheControl(maxAge: 60, scope: PUBLIC)
 }
 
@@ -250,6 +197,66 @@ interface Address {
   phone: String
 }
 
+input AddCartItemInput {
+  amount: Float!
+  variantId: String!
+  qty: Int!
+  componentIds: [String]
+}
+
+input UpdateCartItemInput {
+  itemId: String!
+  qty: Int!
+}
+
+input DeleteCartItemInput {
+  itemId: String!
+}
+
+input ShippingAddressInput {
+  firstname: String!
+  lastname: String!
+  email: String!
+  phone: String!
+  country: String!
+  city: String!
+  state: String
+  street: String!
+  postcode: String!
+}
+
+input UpdatePersonalDataInput {
+  firstname: String!
+  lastname: String!
+  email: String!
+  phone: String!
+}
+
+input CategoryFilter {
+  query: String
+}
+
+input ProductFilter {
+  ids: [String]
+  query: String
+  available: Boolean
+  new: Boolean
+  components: [String]
+  minPrice: Float
+  maxPrice: Float
+}
+
+input PlaceOrderInput {
+  taxAmount: Float
+  shippingAmount: Float
+  summaryAmount: Float
+}
+
+input ProductSort {
+  new: SortType
+  price: SortType
+}
+
 enum CacheControlScope {
   PUBLIC
   PRIVATE
@@ -298,4 +305,9 @@ enum DeliveryStatus {
   PENDING
   DELIVERED
   FAILED
+}
+
+enum SortType {
+  desc
+  asc
 }

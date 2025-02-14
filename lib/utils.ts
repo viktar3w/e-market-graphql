@@ -11,11 +11,10 @@ import {
   ProductArgsType,
   VariantItem,
 } from "@/lib/types/product";
-
+import { CategoryArgsType } from "@/lib/types/category";
 import ProductWhereInput = Prisma.ProductWhereInput;
 import CategoryWhereInput = Prisma.CategoryWhereInput;
 import VariantWhereInput = Prisma.VariantWhereInput;
-import { CategoryArgsType } from "@/lib/types/category";
 
 export const formatPrice = (price: number): string => {
   const formatter = new Intl.NumberFormat("en-US", {
@@ -162,18 +161,21 @@ export const prepareProductPrismaOption = <T>(args: ProductArgsType<T>) => {
       },
     },
     where: {} as ProductWhereInput,
+    orderBy: {} as
+      | Prisma.ProductOrderByWithRelationInput
+      | Prisma.ProductOrderByWithRelationInput[],
   };
   if (Object.keys(args?.filter || {}).length > 0) {
     if (!!args.filter?.ids) {
       options.where.id = {
-        in: args.filter?.ids as string[]
-      }
+        in: args.filter?.ids as string[],
+      };
     }
     if (!!args?.filter?.query) {
       options.where.name = {
         contains: String(args?.filter?.query),
         mode: "insensitive",
-      }
+      };
     }
     if (!!args?.filter?.available) {
       options.where.available =
@@ -205,6 +207,13 @@ export const prepareProductPrismaOption = <T>(args: ProductArgsType<T>) => {
             maxPrice ? { price: { lte: maxPrice } } : undefined,
           ].filter(Boolean) as VariantWhereInput[],
         },
+      };
+    }
+  }
+  if (!!args?.sort && Object.keys(args.sort).length > 0) {
+    if (!!args.sort?.new) {
+      options.orderBy = {
+        new: args.sort.new as Prisma.SortOrder,
       };
     }
   }
@@ -248,7 +257,7 @@ export const generateCacheKey = (
       return `{${sortedObjectKeys.map((key) => `${key}:${processValue((value as Record<string, unknown>)[key])}`).join(",")}}`;
     }
     if (Array.isArray(value)) {
-      return `[${value.map(processValue).sort().join(",")}]`;
+      return `[${value!.map(processValue).sort().join(",")}]`;
     }
     return String(value);
   };
