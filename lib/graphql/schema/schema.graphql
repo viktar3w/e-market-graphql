@@ -111,9 +111,9 @@ type User {
   id: String!
   firstname: String!
   lastname: String!
-  phone: String!
+  phone: String
   email: String!
-  image: String!
+  image: String
   status: UserType!
 }
 type ProductItem {
