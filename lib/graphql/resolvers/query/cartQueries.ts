@@ -32,6 +32,7 @@ const queries = {
         },
         shippingAddress: true,
         billingAddress: true,
+        user: true
       },
     });
     if (!cart || (!userId && !!cart?.userId) || userId !== cart.userId) {
