@@ -34,8 +34,8 @@ export const createSupportSession = async ({
       },
     ],
     mode: "payment",
-    success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/support/dashboard?success=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/support/pricing`,
+    success_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT}/support/dashboard?success=true`,
+    cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT}/support/pricing`,
     customer_email: userEmail,
     metadata: {
       type: PaymentType.SUPPORT,
@@ -56,8 +56,8 @@ export const createProductSession = async ({
   stripe,
 }: CreateProductSessionProps) => {
   return await stripe.checkout.sessions.create({
-    success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout/success?token=${token}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout/error?token=${token}`,
+    success_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT}/checkout/success?token=${token}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT}/checkout/error?token=${token}`,
     payment_method_types: ["card"],
     mode: "payment",
     billing_address_collection: "required",

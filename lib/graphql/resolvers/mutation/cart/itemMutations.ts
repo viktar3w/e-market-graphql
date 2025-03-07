@@ -164,7 +164,6 @@ const mutations = {
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     for (const cartItem of cartInfo.cartItems) {
       const images: string[] = [];
-      console.log(cartItem.productItem.variant.image);
       if (!!cartItem?.productItem?.variant?.image) {
         images.push(cartItem.productItem.variant.image);
       }
